@@ -9,3 +9,5 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 )
+
+retract v0.0.0
