@@ -35,8 +35,11 @@ func (s *Server) Start() {
 
 	// Create the HTTP server
 	server := &http.Server{
-		Addr:    s.Address,
-		Handler: s.Muxer,
+		Addr: s.Address,
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r = r.WithContext(s.ctx)
+			s.Muxer.ServeHTTP(w, r)
+		}),
 	}
 
 	// Register routes to the muxer
@@ -48,6 +51,14 @@ func (s *Server) Start() {
 	if err := server.ListenAndServe(); err != nil {
 		s.Logger.Fatal().Err(err).Msgf("Failed to start server on %s", server.Addr)
 	}
+
+	// Graceful shutdown
+	go func() {
+		<-s.ctx.Done()
+		if err := server.Shutdown(context.Background()); err != nil {
+			s.Logger.Error().Err(err).Msg("Server shutdown failed")
+		}
+	}()
 }
 
 func (s *Server) Stop() {
