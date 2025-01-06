@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type AuthFunc func(http.HandlerFunc) http.Handler
+type AuthFunc func(http.Handler) http.Handler
 
 type Routes struct {
 	Routes          map[string]http.HandlerFunc // path -> handler | Unprotected
