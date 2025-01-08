@@ -10,9 +10,9 @@ import (
 type AuthFunc func(http.Handler) http.Handler
 
 type Routes struct {
-	Routes          map[string]http.HandlerFunc // path -> handler | Unprotected
-	ProtectedRoutes map[string]http.HandlerFunc // path -> handler | Auto registers behind the AuthFunc
-	AuthFunc        AuthFunc                    // func(http.HandlerFunc) http.Handler | ProtectedRoutes will not work without this
+	Routes          map[string]*http.HandlerFunc // path -> handler | Unprotected
+	ProtectedRoutes map[string]*http.HandlerFunc // path -> handler | Auto registers behind the AuthFunc
+	AuthFunc        AuthFunc                     // func(http.HandlerFunc) http.Handler | ProtectedRoutes will not work without this
 }
 
 // Registers all routes supplied
@@ -26,7 +26,11 @@ func (s *Routes) RegisterRoutes(mux *http.ServeMux, logger *zerolog.Logger) {
 	// Register the handler with the muxer
 	for path, handler := range s.Routes {
 		//logger.Debug().Str("route", path).Msg("Registering unprotected route")
-		mux.HandleFunc(path, handler)
+		if handler == nil {
+			mux.HandleFunc(path, NotImplemented)
+			continue
+		}
+		mux.HandleFunc(path, *handler)
 	}
 	// - Protected routes
 	// Make sure the auth func is set for protected routes
@@ -42,6 +46,10 @@ func (s *Routes) RegisterRoutes(mux *http.ServeMux, logger *zerolog.Logger) {
 	// Register the handler with the muxer wrapped by the AuthFunc
 	for path, handler := range s.ProtectedRoutes {
 		//logger.Debug().Str("route", path).Msg("Registering protected route")
+		if handler == nil {
+			mux.HandleFunc(path, NotImplemented)
+			continue
+		}
 		mux.Handle(path, s.AuthFunc(handler))
 	}
 }
@@ -59,4 +67,9 @@ func DefaultAuthFunc(next http.Handler) http.Handler {
 		// Call the next handler
 		next.ServeHTTP(w, r)
 	})
+}
+
+// The default handler for routes that are not implemented
+func NotImplemented(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "Not Implemented", http.StatusNotImplemented)
 }
