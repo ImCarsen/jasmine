@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-    sig = make(chan os.Signal, 1)
+    sig := make(chan os.Signal, 1)
     signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM,
     os.Interrupt)
 
@@ -32,12 +32,12 @@ func main() {
         Routes: jasmine.Routes{
             Routes: map[string]http.HandlerFunc{
                 "POST /test/{id}": test,
-            }
+            },
             ProtectedRoutes: map[string]http.HandlerFunc{
                 "POST /test/{id}": test,
-            }
-            AuthFunc: jasmine.DefaultAuthFunc
-        }
+            },
+            AuthFunc: jasmine.DefaultAuthFunc,
+        },
     } 
 
    go s.Start()
