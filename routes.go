@@ -4,10 +4,9 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
-type AuthFunc func(http.HandlerFunc) Middleware
+type AuthFunc func(http.Handler) Middleware
 
 type Routes struct {
 	Routes          map[string]RouteHandler // path -> handler | Unprotected
@@ -44,24 +43,4 @@ func (s *Routes) RegisterRoutes(mux *http.ServeMux, logger *zerolog.Logger) {
 		//logger.Debug().Str("route", path).Msg("Registering protected route")
 		mux.Handle(path, s.AuthFunc(handler.GetHandler()).GetHandler())
 	}
-}
-
-// Default/Example AuthFunc. This doesn't actually do anything, you will want to create your own func for handling protected routes.
-func DefaultAuthFunc(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Info().Msg("Protected route accessed")
-		// Example for if the user is not authorized
-		if !true {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		// Call the next handler
-		next.ServeHTTP(w, r)
-	})
-}
-
-// The default handler for routes that are not implemented
-func NotImplemented(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
 }
