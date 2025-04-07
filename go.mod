@@ -1,6 +1,6 @@
 module github.com/ImCarsen/jasmine
 
-go 1.23.3
+go 1.24.2
 
 require github.com/rs/zerolog v1.33.0
 
