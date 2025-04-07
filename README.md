@@ -30,11 +30,11 @@ func main() {
     s := jasmine.Server{
         Address: ":8080",
         Routes: jasmine.Routes{
-            Routes: map[string]http.HandlerFunc{
-                "POST /test/{id}": test,
+            Routes: map[string]jasmine.RouteHandler{
+                "POST /test/{id}": jasmine.NotImplemented,
             },
-            ProtectedRoutes: map[string]http.HandlerFunc{
-                "POST /test/{id}": test,
+            ProtectedRoutes: map[string]jasmine.RouteHandler{
+                "POST /test/{id}": jasmine.NotImplemented,
             },
             AuthFunc: jasmine.DefaultAuthFunc,
         },
@@ -44,11 +44,6 @@ func main() {
 
    <-sig
    s.Stop()
-}
-
-func test(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	w.Write([]byte(fmt.Sprintf("ID: %v", id)))
 }
 ```
 
