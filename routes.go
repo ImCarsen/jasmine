@@ -25,7 +25,7 @@ func (s *Routes) RegisterRoutes(mux *http.ServeMux, logger *zerolog.Logger) {
 	// Register the handler with the muxer
 	for path, handler := range s.Routes {
 		//logger.Debug().Str("route", path).Msg("Registering unprotected route")
-		mux.HandleFunc(path, handler.GetHandler())
+		mux.HandleFunc(path, handler.Handler())
 	}
 	// - Protected routes
 	// Make sure the auth func is set for protected routes
@@ -41,6 +41,6 @@ func (s *Routes) RegisterRoutes(mux *http.ServeMux, logger *zerolog.Logger) {
 	// Register the handler with the muxer wrapped by the AuthFunc
 	for path, handler := range s.ProtectedRoutes {
 		//logger.Debug().Str("route", path).Msg("Registering protected route")
-		mux.Handle(path, s.AuthFunc(handler.GetHandler()).GetHandler())
+		mux.Handle(path, s.AuthFunc(handler.Handler()).Handler())
 	}
 }

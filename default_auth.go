@@ -8,19 +8,26 @@ import (
 
 // Default middleware struct for the auth middleware. This is just an example and should be replaced with your own implementation.
 type DefaultAuthMiddleware struct {
-	Next http.Handler
+	NextHandler http.Handler
 }
 
-func (DefaultAuthMiddleware) GetName() string {
+func (DefaultAuthMiddleware) Name() string {
 	return "DefaultAuthMiddleware"
 }
-func (DefaultAuthMiddleware) GetDescription() string {
+
+func (DefaultAuthMiddleware) Description() string {
 	return "Default Auth Middleware"
 }
-func (m DefaultAuthMiddleware) GetNext() http.Handler {
-	return m.Next
+
+func (DefaultAuthMiddleware) Category() string {
+	return "Auth"
 }
-func (m DefaultAuthMiddleware) GetHandler() http.Handler {
+
+func (m DefaultAuthMiddleware) Next() http.Handler {
+	return m.NextHandler
+}
+
+func (m DefaultAuthMiddleware) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Info().Msg("Protected route accessed")
 		// Example for if the user is not authorized
@@ -30,13 +37,13 @@ func (m DefaultAuthMiddleware) GetHandler() http.Handler {
 		}
 
 		// Call the next handler
-		m.Next.ServeHTTP(w, r)
+		m.NextHandler.ServeHTTP(w, r)
 	})
 }
 
 // Default/Example AuthFunc. This doesn't actually do anything, you will want to create your own func for handling protected routes.
 func DefaultAuthFunc(next http.Handler) Middleware {
 	return &DefaultAuthMiddleware{
-		Next: next,
+		NextHandler: next,
 	}
 }
