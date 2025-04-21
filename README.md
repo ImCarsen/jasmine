@@ -1,5 +1,9 @@
 <h1 align="center">Jasmine 🫖</h1>
 
+
+[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/ImCarsen/jasmine?logo=go)](https://golang.org/doc/devel/release.html)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ImCarsen/jasmine)](https://goreportcard.com/report/github.com/ImCarsen/jasmine)
+
 > A simple framework to make building HTTP servers easier
 
 ## What is Jasmine?
