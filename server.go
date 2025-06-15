@@ -17,7 +17,7 @@ type Server struct {
 	Logger *zerolog.Logger
 
 	Context context.Context
-	close   context.CancelCauseFunc
+	Close   context.CancelCauseFunc
 }
 
 func (s *Server) Start() {
@@ -25,8 +25,10 @@ func (s *Server) Start() {
 	if s.Logger == nil {
 		s.Logger = &log.Logger
 	}
-	// Contexts for graceful shutdown
-	s.Context, s.close = context.WithCancelCause(context.Background())
+	// ctxs for graceful shutdown
+	if s.Context == nil || s.Close == nil {
+		s.Context, s.Close = context.WithCancelCause(context.Background())
+	}
 
 	// Set the Muxer
 	if s.Muxer == nil {
@@ -62,6 +64,6 @@ func (s *Server) Start() {
 }
 
 func (s *Server) Stop() {
-	s.close(fmt.Errorf("Server told to stop"))
+	s.Close(fmt.Errorf("Server told to stop"))
 	s.Logger.Info().Msg("Server stopped")
 }
