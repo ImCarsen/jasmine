@@ -16,8 +16,8 @@ type Server struct {
 
 	Logger *zerolog.Logger
 
-	ctx   context.Context
-	close context.CancelCauseFunc
+	Context context.Context
+	close   context.CancelCauseFunc
 }
 
 func (s *Server) Start() {
@@ -26,7 +26,7 @@ func (s *Server) Start() {
 		s.Logger = &log.Logger
 	}
 	// Contexts for graceful shutdown
-	s.ctx, s.close = context.WithCancelCause(context.Background())
+	s.Context, s.close = context.WithCancelCause(context.Background())
 
 	// Set the Muxer
 	if s.Muxer == nil {
@@ -37,7 +37,7 @@ func (s *Server) Start() {
 	server := &http.Server{
 		Addr: s.Address,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r = r.WithContext(s.ctx)
+			r = r.WithContext(s.Context)
 			s.Muxer.ServeHTTP(w, r)
 		}),
 	}
@@ -54,7 +54,7 @@ func (s *Server) Start() {
 
 	// Graceful shutdown
 	go func() {
-		<-s.ctx.Done()
+		<-s.Context.Done()
 		if err := server.Shutdown(context.Background()); err != nil {
 			s.Logger.Error().Err(err).Msg("Server shutdown failed")
 		}
